@@ -19,11 +19,11 @@ jobs:
       run: |
         # 1. 建立一個暫存的資料夾結構
         # ⚠️ 未來有新專案（例如 project），你只要把下面兩行的 htdocs/ 改成 htdocs/project/ 即可！
-        mkdir -p deploy_temp/htdocs/ACCOUNTING/
+        mkdir -p deploy_temp/htdocs/
         
         # 2. 把你專案根目錄的所有網頁檔案，自動複製到剛剛建好的動態資料夾裡
         # (並排除暫存夾與 Git 設定檔，避免重複與上傳雜物)
-        rsync -av --exclude='deploy_temp' --exclude='.git' --exclude='.github' ./ deploy_temp/htdocs/ACCOUNTING/
+        rsync -av --exclude='deploy_temp' --exclude='.git' --exclude='.github' ./ deploy_temp/htdocs/
 
     - name: 📂 步驟3：透過 FTP 安全同步到主機
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
