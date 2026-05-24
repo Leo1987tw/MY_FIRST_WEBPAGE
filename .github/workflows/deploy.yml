@@ -1,0 +1,37 @@
+# ⚠️ 自動化腳本設立前，記得先到遠端資料庫的設定裡面設定三個參數
+name: 🚀 自動外送網頁到免費主機 (終極全自動版)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  web-deploy:
+    name: 🎉 動態結構全自動多專案同步
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 步驟1：取得最新程式碼
+      uses: actions/checkout@v4
+
+    # 💡 核心自動化魔術：在雲端自動配置目錄
+    - name: 🏗️ 步驟2：動態配置專案資料夾結構
+      run: |
+        # 1. 建立一個暫存的資料夾結構
+        # ⚠️ 未來有新專案（例如 project），你只要把下面兩行的 htdocs/ 改成 htdocs/project/ 即可！
+        mkdir -p deploy_temp/htdocs/
+        
+        # 2. 把你專案根目錄的所有網頁檔案，自動複製到剛剛建好的動態資料夾裡
+        # (並排除暫存夾與 Git 設定檔，避免重複與上傳雜物)
+        rsync -av --exclude='deploy_temp' --exclude='.git' --exclude='.github' ./ deploy_temp/htdocs/
+
+    - name: 📂 步驟3：透過 FTP 安全同步到主機
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        # 💡 重點：不要上傳目前的根目錄，改上傳我們剛剛在雲端打包好的暫存資料夾！
+        local-dir: ./deploy_temp/
+        # 💡 直接推到主機的根目錄，它就會自己把 htdocs/專案名稱 完美的覆蓋或建立上去！
+        server-dir: ./ 
